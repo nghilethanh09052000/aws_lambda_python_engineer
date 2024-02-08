@@ -1,12 +1,12 @@
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-import os
 import json
 
 def lambda_handler(event, context):
-    
+    token = event['token']
+
     client = WebClient(
-        token=os.getenv("SLACK_ACCESS_TOKEN")
+        token=token
     )
     try:
         channels = client.conversations_list()['channels']
@@ -16,7 +16,11 @@ def lambda_handler(event, context):
             'body': json.dumps(channels)
         }
     except SlackApiError as e:
-        return {
-            'statusCode': e.response['status'],
-            'body': json.dumps(e.response['body'])
+        error_response = {
+            'statusCode': e.response['status'] or 400,
+            'body': {
+                'error': str(e),
+                'slack_error': e.response['error']
+            }
         }
+        return error_response
