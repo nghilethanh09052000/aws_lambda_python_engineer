@@ -72,8 +72,8 @@ def lambda_handler(event, context):
             replies = client.conversations_replies(
                 channel=thread_message['channel_id'],
                 ts=thread_message['ts'],
-                # oldest=start_time,
-                # latest=end_time
+                oldest=start_time,
+                latest=end_time
             )['messages']
 
             parent_messages = [reply for reply in replies if 'reply_users' in reply and slack_owner in reply['reply_users']]
